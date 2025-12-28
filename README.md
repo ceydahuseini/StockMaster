@@ -20,6 +20,10 @@ cd StockMaster
 
 Create database and run SQL scripts:
 
+**Download SQL files:**
+- [schema_creation.sql](./schema_creation.sql) - Database schema
+- [data_load.sql](./data_load.sql) - Sample data
+
 ```bash
 # Login to PostgreSQL
 psql -U postgres
@@ -94,7 +98,7 @@ brew services start postgresql
 
 ```
 StockMaster/
-├── Controllers/          # MVC Controllers
+├── Controllers/          # Controllers
 ├── Models/               # Database entities
 ├── Views/                # UI pages
 ├── Services/             # Business logic
