@@ -1,0 +1,135 @@
+﻿@model StockMaster.Models.User
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-edit"></i> Edit User</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="/User/Index">Users</a></li>
+                <li class="breadcrumb-item active">Edit</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-info-circle"></i> User Information
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="UserId" />
+                    <input type="hidden" asp-for="CreatedAt" />
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Username" class="form-label">Username *</label>
+                            <input asp-for="Username" class="form-control" placeholder="Enter username" required />
+                            <span asp-validation-for="Username" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="FullName" class="form-label">Full Name *</label>
+                            <input asp-for="FullName" class="form-control" placeholder="Enter full name" required />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Email" class="form-label">Email *</label>
+                            <input asp-for="Email" type="email" class="form-control" placeholder="user@email.com" required />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="PlainPassword" class="form-label">New Password</label>
+                            <input type="password" name="PlainPassword" class="form-control" placeholder="Leave blank to keep current" />
+                            <small class="text-muted">Leave blank if you don't want to change password</small>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Role" class="form-label">Role *</label>
+                            <select asp-for="Role" class="form-select" required>
+                                <option value="">Select role</option>
+                                <option value="Admin">Admin</option>
+                                <option value="Inventory Manager">Inventory Manager</option>
+                                <option value="Sales Personnel">Sales Personnel</option>
+                                <option value="Warehouse Staff">Warehouse Staff</option>
+                            </select>
+                            <span asp-validation-for="Role" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="form-check">
+                                <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+                                <label asp-for="IsActive" class="form-check-label">
+                                    Active
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="/User/Index" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-info-circle"></i> User Details
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <strong>User ID:</strong> @Model.UserId
+                    </li>
+                    <li class="mb-2">
+                        <strong>Created:</strong> @Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+                    </li>
+                    <li>
+                        <strong>Current Status:</strong>
+                        @if (Model.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inactive</span>
+                        }
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <i class="fas fa-exclamation-triangle"></i> Warning
+            </div>
+            <div class="card-body">
+                <p class="mb-0 text-muted small">
+                    <i class="fas fa-info-circle"></i>
+                    Changing user role will affect their system permissions.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

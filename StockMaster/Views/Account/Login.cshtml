@@ -1,0 +1,179 @@
+﻿@model StockMaster.ViewModels.LoginViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Stock Master</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+        }
+
+        .login-header h2 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 2rem;
+        }
+
+        .login-header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+        }
+
+        .login-body {
+            padding: 2.5rem 2rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .input-group-text {
+            background-color: #f1f5f9;
+            border: 2px solid #e2e8f0;
+            border-right: none;
+            border-radius: 10px 0 0 10px;
+        }
+
+        .input-group .form-control {
+            border-left: none;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.875rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: white;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+        }
+
+        .text-danger {
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .icon-wrapper {
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="icon-wrapper">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <h2>Stock Master</h2>
+                <p>Inventory Management System</p>
+            </div>
+            <div class="login-body">
+                <form asp-action="Login" asp-controller="Account" method="post">
+                    <div class="mb-3">
+                        <label asp-for="Username" class="form-label">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <input asp-for="Username" class="form-control" placeholder="Enter your username" />
+                        </div>
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Password" class="form-label">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                            <input asp-for="Password" class="form-control" placeholder="Enter your password" />
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    @if (ViewData.ModelState.ErrorCount > 0 && !ViewData.ModelState.ContainsKey("Username") && !ViewData.ModelState.ContainsKey("Password"))
+                    {
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            @Html.ValidationSummary(false, "", new { @class = "mb-0" })
+                        </div>
+                    }
+
+                    <button type="submit" class="btn btn-login">
+                        <i class="fas fa-sign-in-alt me-2"></i> Login
+                    </button>
+                </form>
+
+                <div class="mt-4 text-center text-muted">
+                    <small>
+                        <i class="fas fa-info-circle"></i>
+                        Demo: ceyda_admin / test123
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

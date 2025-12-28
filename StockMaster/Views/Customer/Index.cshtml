@@ -1,0 +1,99 @@
+﻿@model List<StockMaster.Models.Customer>
+@{
+    ViewData["Title"] = "Customers";
+}
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2><i class="fas fa-users"></i> Customer Management</h2>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="/Customer/Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Customer
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-list"></i> Customer List
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <input type="text" class="form-control" placeholder="Search customers..." id="searchBox">
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover" id="customersTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Created Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var customer in Model)
+                    {
+                        <tr>
+                            <td>@customer.CustomerId</td>
+                            <td><strong>@customer.Name</strong></td>
+                            <td>@customer.Email</td>
+                            <td>@customer.Phone</td>
+                            <td>@customer.Address</td>
+                            <td>@customer.CreatedAt.ToString("dd.MM.yyyy")</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/Customer/Edit/@customer.CustomerId" class="btn btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button onclick="deleteCustomer(@customer.CustomerId)" class="btn btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No customers found.</p>
+                <a href="/Customer/Create" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add First Customer
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function deleteCustomer(id) {
+            if (confirm('Are you sure you want to delete this customer?')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/Customer/Delete/' + id;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        $(document).ready(function() {
+            $('#searchBox').on('keyup', function() {
+                const value = $(this).val().toLowerCase();
+                $('#customersTable tbody tr').filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
+        });
+    </script>
+}

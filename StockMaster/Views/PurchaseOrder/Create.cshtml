@@ -1,0 +1,291 @@
+﻿@model StockMaster.ViewModels.PurchaseOrderCreateViewModel
+@{
+    ViewData["Title"] = "New Purchase Order";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-truck"></i> Create New Purchase Order</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="/PurchaseOrder/Index">Purchase Orders</a></li>
+                <li class="breadcrumb-item active">New Order</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<form id="poForm" method="post" action="/PurchaseOrder/Create">
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> Order Information
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Supplier</label>
+                            <select name="SupplierId" class="form-select">
+                                <option value="">Select supplier (optional)</option>
+                                @foreach (var supplier in ViewBag.Suppliers)
+                                {
+                                    <option value="@supplier.SupplierId">@supplier.Name</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Warehouse *</label>
+                            <select name="WarehouseId" class="form-select" required>
+                                <option value="">Select warehouse</option>
+                                @foreach (var warehouse in ViewBag.Warehouses)
+                                {
+                                    <option value="@warehouse.WarehouseId">@warehouse.Name</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Expected Delivery Date *</label>
+                            <input type="date" name="ExpectedDeliveryDate" class="form-control" 
+                                   min="@DateTime.Now.ToString("yyyy-MM-dd")" 
+                                   value="@DateTime.Now.AddDays(7).ToString("yyyy-MM-dd")" required />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-list"></i> Order Items</span>
+                    <button type="button" class="btn btn-sm btn-success" onclick="addItem()">
+                        <i class="fas fa-plus"></i> Add Product
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="itemsContainer">
+                        
+                    </div>
+
+                    <div id="itemTemplate" style="display: none;">
+                        <div class="card mb-3 item-row">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <label class="form-label">Product *</label>
+                                        <select class="form-select product-select" required>
+                                            <option value="">Select product</option>
+                                            @foreach (var product in ViewBag.Products)
+                                            {
+                                                <option value="@product.ProductId" data-sku="@product.Sku">
+                                                    @product.Name (SKU: @product.Sku)
+                                                </option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Quantity *</label>
+                                        <input type="number" class="form-control quantity-input" min="1" value="1" required />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Unit Cost (MKD) *</label>
+                                        <input type="number" class="form-control cost-input" step="0.01" min="0" required />
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label class="form-label">&nbsp;</label>
+                                        <button type="button" class="btn btn-danger w-100" onclick="removeItem(this)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <small class="text-muted">
+                                            Total: <span class="item-total">0.00</span> MKD
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (ViewBag.Products == null || !ViewBag.Products.Any())
+                    {
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            No products available. Please add products first.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <i class="fas fa-calculator"></i> Order Summary
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Product Types:</span>
+                            <strong id="itemCount">0</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Total Quantity:</span>
+                            <strong id="totalQuantity">0</strong>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <h5>Total Cost:</h5>
+                            <h5 class="text-primary">
+                                <strong id="totalCost">0.00 MKD</strong>
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <i class="fas fa-lightbulb"></i> Tips
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Check supplier information
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Set correct delivery date
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Review unit costs
+                        </li>
+                        <li>
+                            <i class="fas fa-check text-success me-2"></i>
+                            Verify stock levels
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-check"></i> Create Order
+                        </button>
+                        <a href="/PurchaseOrder/Index" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        let itemIndex = 0;
+
+        function addItem() {
+            const template = document.getElementById('itemTemplate').innerHTML;
+            const container = document.getElementById('itemsContainer');
+            const itemDiv = document.createElement('div');
+            itemDiv.innerHTML = template;
+            
+            const row = itemDiv.firstElementChild;
+            const productSelect = row.querySelector('.product-select');
+            const quantityInput = row.querySelector('.quantity-input');
+            const costInput = row.querySelector('.cost-input');
+
+            productSelect.name = `Items[${itemIndex}].ProductId`;
+            quantityInput.name = `Items[${itemIndex}].Quantity`;
+            costInput.name = `Items[${itemIndex}].UnitCost`;
+
+            productSelect.addEventListener('change', function() {
+                calculateItemTotal.call(this);
+            });
+            quantityInput.addEventListener('input', function() {
+                calculateItemTotal.call(this);
+                calculateSummary();
+            });
+            costInput.addEventListener('input', function() {
+                calculateItemTotal.call(this);
+                calculateSummary();
+            });
+
+            container.appendChild(row);
+            itemIndex++;
+            calculateSummary();
+        }
+
+        function removeItem(button) {
+            button.closest('.item-row').remove();
+            calculateSummary();
+        }
+
+        function calculateItemTotal() {
+            const row = this.closest('.item-row');
+            const quantity = parseFloat(row.querySelector('.quantity-input').value) || 0;
+            const cost = parseFloat(row.querySelector('.cost-input').value) || 0;
+            const total = quantity * cost;
+            row.querySelector('.item-total').textContent = total.toFixed(2);
+        }
+
+        function calculateSummary() {
+            const items = document.querySelectorAll('.item-row');
+            let totalCost = 0;
+            let totalQuantity = 0;
+
+            items.forEach(row => {
+                const quantity = parseFloat(row.querySelector('.quantity-input').value) || 0;
+                const cost = parseFloat(row.querySelector('.cost-input').value) || 0;
+                totalCost += quantity * cost;
+                totalQuantity += quantity;
+            });
+
+            document.getElementById('itemCount').textContent = items.length;
+            document.getElementById('totalQuantity').textContent = totalQuantity;
+            document.getElementById('totalCost').textContent = totalCost.toFixed(2) + ' MKD';
+        }
+
+        window.addEventListener('DOMContentLoaded', function() {
+            addItem();
+        });
+
+        document.getElementById('poForm').addEventListener('submit', function(e) {
+            const itemsCount = document.querySelectorAll('.item-row').length;
+            if (itemsCount === 0) {
+                e.preventDefault();
+                alert('You must add at least one product!');
+                return false;
+            }
+
+            
+            let allValid = true;
+            document.querySelectorAll('.item-row').forEach(row => {
+                const productSelect = row.querySelector('.product-select');
+                if (!productSelect.value) {
+                    allValid = false;
+                    productSelect.classList.add('is-invalid');
+                }
+            });
+
+            if (!allValid) {
+                e.preventDefault();
+                alert('Please select products for all items!');
+                return false;
+            }
+
+            return true;
+        });
+    </script>
+}

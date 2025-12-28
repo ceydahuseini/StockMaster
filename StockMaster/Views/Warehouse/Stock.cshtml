@@ -1,0 +1,171 @@
+﻿@model List<StockMaster.Models.WarehouseStock>
+@{
+    ViewData["Title"] = "Warehouse Stock Status";
+    var warehouse = ViewBag.Warehouse as StockMaster.Models.Warehouse;
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-boxes"></i> @warehouse.Name - Stock Status</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="/Warehouse/Index">Warehouses</a></li>
+                <li class="breadcrumb-item active">@warehouse.Name</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-muted mb-1">Total Product Types</p>
+                    <h3 class="mb-0">@Model.Count</h3>
+                </div>
+                <div class="stat-icon" style="background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);">
+                    <i class="fas fa-box"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-muted mb-1">Total Stock Quantity</p>
+                    <h3 class="mb-0">@Model.Sum(s => s.QuantityOnHand)</h3>
+                </div>
+                <div class="stat-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                    <i class="fas fa-cubes"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-muted mb-1">Low Stock Alert</p>
+                    <h3 class="mb-0 text-warning">
+                        @Model.Count(s => s.QuantityOnHand <= s.Product.ReorderLevel)
+                    </h3>
+                </div>
+                <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-list"></i> Stock List
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <input type="text" class="form-control" placeholder="Search products..." id="searchBox">
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover" id="stockTable">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>SKU</th>
+                        <th>Category</th>
+                        <th class="text-center">Quantity On Hand</th>
+                        <th class="text-center">Reorder Level</th>
+                        <th class="text-center">Status</th>
+                        <th>Last Updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var stock in Model.OrderBy(s => s.Product.Name))
+                    {
+                        var isLowStock = stock.QuantityOnHand <= stock.Product.ReorderLevel;
+                        var statusClass = isLowStock ? "table-warning" : "";
+                        
+                        <tr class="@statusClass">
+                            <td>
+                                <strong>@stock.Product.Name</strong>
+                                @if (isLowStock)
+                                {
+                                    <br>
+                                    <small class="text-warning">
+                                        <i class="fas fa-exclamation-triangle"></i> Low Stock!
+                                    </small>
+                                }
+                            </td>
+                            <td>
+                                <code>@stock.Product.Sku</code>
+                            </td>
+                            <td>
+                                @(stock.Product.Category?.Name ?? "-")
+                            </td>
+                            <td class="text-center">
+                                <span class="badge @(isLowStock ? "bg-warning" : "bg-success") fs-6">
+                                    @stock.QuantityOnHand
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-info">
+                                    @stock.Product.ReorderLevel
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                @if (stock.QuantityOnHand == 0)
+                                {
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-times"></i> Out of Stock
+                                    </span>
+                                }
+                                else if (isLowStock)
+                                {
+                                    <span class="badge bg-warning">
+                                        <i class="fas fa-exclamation-triangle"></i> Low
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check"></i> Sufficient
+                                    </span>
+                                }
+                            </td>
+                            <td>
+                                <small>@stock.LastUpdated.ToString("dd.MM.yyyy HH:mm")</small>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No stock records found in this warehouse.</p>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#searchBox').on('keyup', function() {
+                const value = $(this).val().toLowerCase();
+                $('#stockTable tbody tr').filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
+        });
+    </script>
+}

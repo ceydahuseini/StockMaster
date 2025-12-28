@@ -1,0 +1,63 @@
+﻿@model List<StockMaster.Models.Warehouse>
+@{
+    ViewData["Title"] = "Warehouses";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-warehouse"></i> Warehouse Management</h2>
+    </div>
+</div>
+
+<div class="row">
+    @foreach (var warehouse in Model)
+    {
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-warehouse me-2"></i>
+                        @warehouse.Name
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small">Location</label>
+                        <p class="mb-0">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            @warehouse.Location
+                        </p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="text-muted small">Capacity</label>
+                        <p class="mb-0">
+                            <i class="fas fa-box me-2"></i>
+                            @warehouse.Capacity.ToString("N0") units
+                        </p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="text-muted small">Created Date</label>
+                        <p class="mb-0">
+                            <i class="fas fa-calendar me-2"></i>
+                            @warehouse.CreatedAt.ToString("dd.MM.yyyy")
+                        </p>
+                    </div>
+
+                    <a href="/Warehouse/Stock/@warehouse.WarehouseId" class="btn btn-primary w-100">
+                        <i class="fas fa-boxes"></i> View Stock Status
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <div class="text-center py-5">
+        <i class="fas fa-warehouse fa-3x text-muted mb-3"></i>
+        <p class="text-muted">No warehouses found.</p>
+    </div>
+}

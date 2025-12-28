@@ -1,0 +1,74 @@
+﻿@model StockMaster.Models.Category
+@{
+    ViewData["Title"] = "New Category";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-plus-circle"></i> Add New Category</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="/Category/Index">Categories</a></li>
+                <li class="breadcrumb-item active">New Category</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-info-circle"></i> Category Information
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label">Category Name *</label>
+                        <input asp-for="Name" class="form-control" placeholder="Enter category name" required />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label">Description</label>
+                        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Category description"></textarea>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="/Category/Index" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-lightbulb"></i> Tips
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Use clear category names
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Add detailed description
+                    </li>
+                    <li>
+                        <i class="fas fa-check text-success me-2"></i>
+                        Categories help organize products
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
