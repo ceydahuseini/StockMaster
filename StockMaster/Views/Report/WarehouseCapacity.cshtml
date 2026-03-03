@@ -1,0 +1,61 @@
+﻿@model List<StockMaster.ViewModels.WarehouseCapacityViewModel>
+@{ ViewData["Title"] = "Warehouse Capacity"; }
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Warehouse Capacity</h2>
+    <div>
+        <a href="/Report/Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+        <a href="/Report/ExportWarehouseCapacity" class="btn btn-success"><i class="fas fa-file-csv"></i> CSV</a>
+        <button onclick="exportToPDF()" class="btn btn-danger"><i class="fas fa-file-pdf"></i> PDF</button>
+    </div>
+</div>
+
+<div id="reportContent">
+    <table class="table table-bordered">
+        <thead class="table-warning">
+            <tr>
+                <th>Warehouse</th>
+                <th>Capacity</th>
+                <th>In Stock</th>
+                <th>Occupancy</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var item in Model) {
+            <tr>
+                <td>@item.WarehouseName</td>
+                <td>@item.Capacity</td>
+                <td>@item.UnitsInStock</td>
+                <td>
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar @(item.OccupancyPercentage > 90 ? "bg-danger" : "bg-success")" 
+                             role="progressbar" 
+                             style="width: @item.OccupancyPercentage%;" 
+                             aria-valuenow="@item.OccupancyPercentage" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            @item.OccupancyPercentage%
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function exportToPDF() {
+            var element = document.getElementById('reportContent');
+            var opt = {
+                margin: 0.5, filename: 'WarehouseCapacity.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+}

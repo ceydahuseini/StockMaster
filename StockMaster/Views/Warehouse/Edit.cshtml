@@ -1,0 +1,56 @@
+﻿@model StockMaster.Models.Warehouse
+@{
+    ViewData["Title"] = "Edit Warehouse";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-edit"></i> Edit Warehouse</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="/Warehouse/Index">Warehouses</a></li>
+                <li class="breadcrumb-item active">Edit</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-info-circle"></i> Update Details
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="WarehouseId" />
+                    <input type="hidden" asp-for="CreatedAt" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Warehouse Name *</label>
+                        <input asp-for="Name" class="form-control" required />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Location *</label>
+                        <input asp-for="Location" class="form-control" required />
+                        <span asp-validation-for="Location" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Capacity (Units) *</label>
+                        <input asp-for="Capacity" type="number" class="form-control" min="1" required />
+                        <span asp-validation-for="Capacity" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="/Warehouse/Index" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Update Warehouse</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,56 @@
+﻿@model List<StockMaster.Models.VwSalesByDay>
+@{
+    ViewData["Title"] = "Sales by Day";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Sales by Day of Week</h2>
+    <div>
+        <a href="/Report/Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+        <a href="/Report/ExportSalesByDay" class="btn btn-success"><i class="fas fa-file-csv"></i> CSV</a>
+        <button onclick="exportToPDF()" class="btn btn-danger"><i class="fas fa-file-pdf"></i> PDF</button>
+    </div>
+</div>
+
+<div id="reportContent">
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Day</th>
+                <th>Total Sales</th>
+                <th>Revenue</th>
+                <th>Avg Sale</th>
+                <th>Items Sold</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.DayName</td>
+                    <td>@item.TotalSales</td>
+                    <td>@item.TotalRevenue.ToString("N2") MKD</td>
+                    <td>@item.AvgSaleValue.ToString("N2") MKD</td>
+                    <td>@item.TotalItemsSold</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function exportToPDF() {
+            var element = document.getElementById('reportContent');
+            var opt = {
+                margin: 0.5,
+                filename: 'SalesByDayReport.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+}

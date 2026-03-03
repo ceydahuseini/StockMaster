@@ -1,0 +1,230 @@
+﻿@model StockMaster.Models.Sale
+@{
+    ViewData["Title"] = "Sale Details";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-shopping-cart"></i> Sale Details</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="/Sale/Index">Sales</a></li>
+                <li class="breadcrumb-item active">Sale #@Model.SaleId</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    
+    <div class="col-md-8">
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-info-circle"></i> General Information
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="text-muted small mb-1">Sale Number</label>
+                        <h5><strong>#@Model.SaleId</strong></h5>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small mb-1">Date & Time</label>
+                        <h5>
+                            <i class="fas fa-calendar me-2"></i>
+                            @Model.DateTime.ToString("dd.MM.yyyy HH:mm")
+                        </h5>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="text-muted small mb-1">Warehouse</label>
+                        <h5>
+                            <i class="fas fa-warehouse me-2"></i>
+                            @Model.Warehouse.Name
+                        </h5>
+                        <small class="text-muted">@Model.Warehouse.Location</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small mb-1">Salesperson</label>
+                        <h5>
+                            @if (Model.User != null)
+                            {
+                                <span class="badge bg-info text-dark">
+                                    <i class="fas fa-user-tag me-1"></i> @Model.User.FullName
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Unknown</span>
+                            }
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-list"></i> Sale Items
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Product</th>
+                                <th class="text-center">Quantity</th>
+                                <th class="text-end">Unit Price</th>
+                                <th class="text-end">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.SaleItems)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>@item.Product.Name</strong>
+                                        <br>
+                                        <small class="text-muted">SKU: @item.Product.Sku</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary">@item.Quantity</span>
+                                    </td>
+                                    <td class="text-end">
+                                        @item.UnitPriceAtSale.ToString("N2") MKD
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>@((item.Quantity * item.UnitPriceAtSale).ToString("N2")) MKD</strong>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-light">
+                                <td colspan="3" class="text-end">
+                                    <strong>TOTAL AMOUNT:</strong>
+                                </td>
+                                <td class="text-end">
+                                    <h5 class="mb-0 text-success">
+                                        <strong>@Model.TotalAmount.ToString("N2") MKD</strong>
+                                    </h5>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="col-md-4">
+        
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fas fa-calculator"></i> Summary
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Items Count:</span>
+                    <strong>@Model.SaleItems.Count</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Total Quantity:</span>
+                    <strong>@Model.SaleItems.Sum(i => i.Quantity)</strong>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5>Total:</h5>
+                    <h4 class="text-success mb-0">
+                        <strong>@Model.TotalAmount.ToString("N2") MKD</strong>
+                    </h4>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fas fa-user"></i> Customer Information
+            </div>
+            <div class="card-body">
+                @if (Model.Customer != null)
+                {
+                    <div class="mb-3">
+                        <h5 class="card-title">@Model.Customer.Name</h5>
+                        <p class="card-text text-muted mb-1">
+                            <i class="fas fa-envelope me-2"></i> @Model.Customer.Email
+                        </p>
+                        <p class="card-text text-muted mb-1">
+                            <i class="fas fa-phone me-2"></i> @Model.Customer.Phone
+                        </p>
+                        <p class="card-text text-muted">
+                            <i class="fas fa-map-marker-alt me-2"></i> @Model.Customer.Address
+                        </p>
+                    </div>
+                    <div class="d-grid">
+                        <a href="mailto:@Model.Customer.Email" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-envelope"></i> Send Email
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-3 text-muted">
+                        <i class="fas fa-user-slash fa-2x mb-2"></i>
+                        <p>Walk-in Customer<br>(No customer selected)</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-tools"></i> Actions
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary btn-lg" onclick="window.print()">
+                        <i class="fas fa-print"></i> Print Invoice
+                    </button>
+                    <a href="/Sale/Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        @@media print {
+            .navbar, .breadcrumb, .card:last-child, button, a.btn {
+                display: none !important;
+            }
+
+            .card {
+                border: 1px solid #ddd !important;
+                box-shadow: none !important;
+                margin-bottom: 20px !important;
+            }
+
+            .card-header {
+                background-color: #f8f9fa !important;
+                color: black !important;
+                border-bottom: 1px solid #ddd !important;
+            }
+
+            body {
+                background-color: white !important;
+            }
+        }
+    </style>
+}

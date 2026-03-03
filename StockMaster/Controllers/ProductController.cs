@@ -74,12 +74,10 @@ namespace StockMaster.Controllers
             ViewBag.Suppliers = _context.Suppliers.OrderBy(s => s.Name).ToList();
             return View(product);
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Product product)
         {
-            
             ModelState.Remove("Category");
             ModelState.Remove("Supplier");
 
@@ -87,7 +85,10 @@ namespace StockMaster.Controllers
             {
                 try
                 {
-                    var result = await _productService.UpdateProductAsync(product);
+                    var currentUserName = User.Identity?.Name ?? "system";
+
+                    var result = await _productService.UpdateProductWithUserAsync(product, currentUserName);
+
                     if (result)
                     {
                         TempData["Success"] = "Product updated successfully";
@@ -105,7 +106,7 @@ namespace StockMaster.Controllers
             ViewBag.Suppliers = _context.Suppliers.OrderBy(s => s.Name).ToList();
             return View(product);
         }
-
+   
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)

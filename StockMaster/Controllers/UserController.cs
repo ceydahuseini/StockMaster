@@ -35,14 +35,14 @@ namespace StockMaster.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(User user, string PlainPassword)
         {
-            
+
             if (string.IsNullOrEmpty(PlainPassword))
             {
                 ModelState.AddModelError("PlainPassword", "Password is required");
                 return View(user);
             }
 
-          
+
             ModelState.Remove("Password");
 
             if (ModelState.IsValid)
@@ -76,39 +76,65 @@ namespace StockMaster.Controllers
             return View(user);
         }
 
+
         [HttpPost]
         public async Task<IActionResult> Edit(User user, string PlainPassword)
         {
-            if (ModelState.IsValid)
+            ModelState.Remove("Password");      
+            ModelState.Remove("CreatedAt");     
+            ModelState.Remove("PlainPassword"); 
+
+            if (!ModelState.IsValid)
             {
-                try
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var error in errors)
                 {
-                    var existingUser = await _context.Users.FindAsync(user.UserId);
-                    if (existingUser != null)
-                    {
-                        existingUser.Username = user.Username;
-                        existingUser.FullName = user.FullName;
-                        existingUser.Email = user.Email;
-                        existingUser.Role = user.Role;
-                        existingUser.IsActive = user.IsActive;
-
-                        
-                        if (!string.IsNullOrEmpty(PlainPassword))
-                        {
-                            existingUser.Password = BCrypt.Net.BCrypt.HashPassword(PlainPassword);
-                        }
-
-                        await _context.SaveChangesAsync();
-                        TempData["Success"] = "User updated successfully";
-                        return RedirectToAction("Index");
-                    }
+                    ModelState.AddModelError("", "Validation Error: " + error.ErrorMessage);
                 }
-                catch
-                {
-                    ModelState.AddModelError("", "Failed to update user");
-                }
+                return View(user);
             }
-            return View(user);
+
+            try
+            {
+                var existingUser = await _context.Users.FindAsync(user.UserId);
+
+                if (existingUser == null)
+                {
+                    return NotFound();
+                }
+
+                
+                var usernameExists = await _context.Users.AnyAsync(u => u.Username == user.Username && u.UserId != user.UserId);
+                if (usernameExists)
+                {
+                    ModelState.AddModelError("Username", "This username is already taken.");
+                    return View(user);
+                }
+
+                
+                existingUser.Username = user.Username;
+                existingUser.FullName = user.FullName;
+                existingUser.Email = user.Email;
+                existingUser.Role = user.Role;
+                existingUser.IsActive = user.IsActive;
+
+               
+                if (!string.IsNullOrEmpty(PlainPassword))
+                {
+                    existingUser.Password = BCrypt.Net.BCrypt.HashPassword(PlainPassword);
+                }
+
+                _context.Users.Update(existingUser);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "User updated successfully";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "System Error: " + ex.Message);
+                return View(user);
+            }
         }
 
         [HttpPost]

@@ -99,7 +99,7 @@
                 form.method = 'POST';
                 form.action = '/Product/Delete/' + id;
 
-                // Add antiforgery token
+                
                 const token = document.querySelector('input[name="__RequestVerificationToken"]');
                 if (token) {
                     const input = document.createElement('input');

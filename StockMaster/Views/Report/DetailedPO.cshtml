@@ -1,0 +1,85 @@
+﻿@model List<StockMaster.ViewModels.DetailedPOViewModel>
+@{
+    ViewData["Title"] = "Detailed Purchase Order Report";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Detailed Purchase Order Report</h2>
+    <div>
+        <a href="/Report/Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+        <a href="/Report/ExportDetailedPO" class="btn btn-success"><i class="fas fa-file-csv"></i> CSV</a>
+        <button onclick="exportToPDF()" class="btn btn-danger"><i class="fas fa-file-pdf"></i> PDF</button>
+    </div>
+</div>
+
+<div id="reportContent">
+    <table class="table table-bordered table-striped" style="font-size: 0.9rem;">
+        <thead class="table-dark">
+            <tr>
+                <th>PO #</th>
+                <th>Status</th>
+                <th>Exp. Date</th>
+                <th>Supplier</th>
+                <th>Warehouse</th>
+                <th>Product</th>
+                <th>Ord.</th>
+                <th>Rec.</th>
+                <th>Rem.</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>#@item.PoId</td>
+                    <td>
+                        @if (item.Status == "Received")
+                        {
+                            <span class="badge bg-success">Recv</span>
+                        }
+                        else if (item.Status == "Pending")
+                        {
+                            <span class="badge bg-warning text-dark">Pend</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">@item.Status</span>
+                        }
+                    </td>
+                    <td>@item.ExpectedDeliveryDate.ToString("dd.MM.yyyy")</td>
+                    <td>@item.SupplierName</td>
+                    <td>@item.WarehouseName</td>
+                    <td>@item.ProductName</td>
+                    <td class="text-center fw-bold">@item.OrderedQty</td>
+                    <td class="text-center text-success">@item.ReceivedQty</td>
+                    <td class="text-center text-danger">
+                        @if (item.RemainingToReceive > 0)
+                        {
+                            <strong>@item.RemainingToReceive</strong>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function exportToPDF() {
+            var element = document.getElementById('reportContent');
+            var opt = {
+                margin: 0.2, filename: 'DetailedPO.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' } 
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+}

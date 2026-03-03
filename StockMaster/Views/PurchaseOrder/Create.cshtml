@@ -29,7 +29,7 @@
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Supplier</label>
                             <select name="SupplierId" class="form-select">
-                                <option value="">Select supplier (optional)</option>
+                                <option value="">Select supplier</option>
                                 @foreach (var supplier in ViewBag.Suppliers)
                                 {
                                     <option value="@supplier.SupplierId">@supplier.Name</option>
@@ -50,8 +50,8 @@
 
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Expected Delivery Date *</label>
-                            <input type="date" name="ExpectedDeliveryDate" class="form-control" 
-                                   min="@DateTime.Now.ToString("yyyy-MM-dd")" 
+                            <input type="date" name="ExpectedDeliveryDate" class="form-control"
+                                   min="@DateTime.Now.ToString("yyyy-MM-dd")"
                                    value="@DateTime.Now.AddDays(7).ToString("yyyy-MM-dd")" required />
                         </div>
                     </div>
@@ -70,49 +70,8 @@
                         
                     </div>
 
-                    <div id="itemTemplate" style="display: none;">
-                        <div class="card mb-3 item-row">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-5">
-                                        <label class="form-label">Product *</label>
-                                        <select class="form-select product-select" required>
-                                            <option value="">Select product</option>
-                                            @foreach (var product in ViewBag.Products)
-                                            {
-                                                <option value="@product.ProductId" data-sku="@product.Sku">
-                                                    @product.Name (SKU: @product.Sku)
-                                                </option>
-                                            }
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Quantity *</label>
-                                        <input type="number" class="form-control quantity-input" min="1" value="1" required />
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Unit Cost (MKD) *</label>
-                                        <input type="number" class="form-control cost-input" step="0.01" min="0" required />
-                                    </div>
-                                    <div class="col-md-1">
-                                        <label class="form-label">&nbsp;</label>
-                                        <button type="button" class="btn btn-danger w-100" onclick="removeItem(this)">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="row mt-2">
-                                    <div class="col-12">
-                                        <small class="text-muted">
-                                            Total: <span class="item-total">0.00</span> MKD
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    @if (ViewBag.Products == null || !ViewBag.Products.Any())
+                    
+                    @if (ViewBag.Products == null || ViewBag.Products.Count == 0)
                     {
                         <div class="alert alert-warning">
                             <i class="fas fa-exclamation-triangle"></i>
@@ -191,25 +150,66 @@
     </div>
 </form>
 
+
+<div id="itemTemplate" style="display: none;">
+    <div class="card mb-3 item-row">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-5">
+                    <label class="form-label">Product *</label>
+                    <select class="form-select product-select" required>
+                        <option value="">Select product</option>
+                        @foreach (var product in ViewBag.Products)
+                        {
+                            <option value="@product.ProductId" data-sku="@product.Sku">
+                                @product.Name (SKU: @product.Sku)
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Quantity *</label>
+                    <input type="number" class="form-control quantity-input" min="1" value="1" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Unit Cost (MKD) *</label>
+                    <input type="number" class="form-control cost-input" step="0.01" min="0" required />
+                </div>
+                <div class="col-md-1">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="button" class="btn btn-danger w-100" onclick="removeItem(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <small class="text-muted">
+                        Total: <span class="item-total">0.00</span> MKD
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
-        let itemIndex = 0;
-
         function addItem() {
             const template = document.getElementById('itemTemplate').innerHTML;
             const container = document.getElementById('itemsContainer');
             const itemDiv = document.createElement('div');
-            itemDiv.innerHTML = template;
             
+            itemDiv.innerHTML = template;
+
             const row = itemDiv.firstElementChild;
+            container.appendChild(row);
+
             const productSelect = row.querySelector('.product-select');
             const quantityInput = row.querySelector('.quantity-input');
             const costInput = row.querySelector('.cost-input');
 
-            productSelect.name = `Items[${itemIndex}].ProductId`;
-            quantityInput.name = `Items[${itemIndex}].Quantity`;
-            costInput.name = `Items[${itemIndex}].UnitCost`;
-
+            
             productSelect.addEventListener('change', function() {
                 calculateItemTotal.call(this);
             });
@@ -222,14 +222,28 @@
                 calculateSummary();
             });
 
-            container.appendChild(row);
-            itemIndex++;
+            
+            updateIndices();
             calculateSummary();
         }
 
         function removeItem(button) {
             button.closest('.item-row').remove();
+            updateIndices();
             calculateSummary();
+        }
+
+        
+        function updateIndices() {
+            document.querySelectorAll('#itemsContainer .item-row').forEach((row, index) => {
+                const productSelect = row.querySelector('.product-select');
+                const quantityInput = row.querySelector('.quantity-input');
+                const costInput = row.querySelector('.cost-input');
+
+                productSelect.name = `Items[${index}].ProductId`;
+                quantityInput.name = `Items[${index}].Quantity`;
+                costInput.name = `Items[${index}].UnitCost`;
+            });
         }
 
         function calculateItemTotal() {
@@ -241,7 +255,7 @@
         }
 
         function calculateSummary() {
-            const items = document.querySelectorAll('.item-row');
+            const items = document.querySelectorAll('#itemsContainer .item-row');
             let totalCost = 0;
             let totalQuantity = 0;
 
@@ -262,20 +276,21 @@
         });
 
         document.getElementById('poForm').addEventListener('submit', function(e) {
-            const itemsCount = document.querySelectorAll('.item-row').length;
+            const itemsCount = document.querySelectorAll('#itemsContainer .item-row').length;
             if (itemsCount === 0) {
                 e.preventDefault();
                 alert('You must add at least one product!');
                 return false;
             }
 
-            
             let allValid = true;
-            document.querySelectorAll('.item-row').forEach(row => {
+            document.querySelectorAll('#itemsContainer .item-row').forEach(row => {
                 const productSelect = row.querySelector('.product-select');
                 if (!productSelect.value) {
                     allValid = false;
                     productSelect.classList.add('is-invalid');
+                } else {
+                    productSelect.classList.remove('is-invalid');
                 }
             });
 

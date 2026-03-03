@@ -38,20 +38,26 @@ namespace StockMaster.Services
                 .FirstOrDefaultAsync(po => po.PoId == id);
         }
 
+      
+
         public async Task<bool> CreatePurchaseOrderAsync(PurchaseOrder po)
         {
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 _context.PurchaseOrders.Add(po);
                 await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
                 return true;
             }
             catch
             {
+                await transaction.RollbackAsync();
                 return false;
             }
         }
-
+        
         public async Task<bool> ReceivePurchaseOrderAsync(int poId)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -61,7 +67,7 @@ namespace StockMaster.Services
                 if (po == null || po.Status == "Received")
                     return false;
 
-                // Update stock
+                
                 foreach (var item in po.PurchaseOrderItems)
                 {
                     var stock = await _context.WarehouseStocks

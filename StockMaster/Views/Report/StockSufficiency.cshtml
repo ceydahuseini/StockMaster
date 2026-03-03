@@ -1,0 +1,57 @@
+﻿@model List<StockMaster.ViewModels.StockSufficiencyViewModel>
+@{
+    ViewData["Title"] = "Stock Trend Analysis";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Stock Sufficiency & Trend Analysis</h2>
+    <div>
+        <a href="/Report/Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+        <a href="/Report/ExportStockSufficiency" class="btn btn-success"><i class="fas fa-file-csv"></i> CSV</a>
+        <button onclick="exportToPDF()" class="btn btn-danger"><i class="fas fa-file-pdf"></i> PDF</button>
+    </div>
+</div>
+
+<div id="reportContent">
+    <table class="table table-bordered">
+        <thead class="table-secondary">
+            <tr>
+                <th>Product</th>
+                <th>Sold (60 Days)</th>
+                <th>Avg Daily</th>
+                <th>Projected (30 Days)</th>
+                <th>Current Stock</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="@(item.StockStatus == "INSUFFICIENT" ? "table-danger" : "table-success")">
+                    <td>@item.ProductName</td>
+                    <td>@item.SoldLast60Days</td>
+                    <td>@item.AvgDailySales</td>
+                    <td>@item.ProjectedNext30Days</td>
+                    <td>@item.CurrentTotalStock</td>
+                    <td><strong>@item.StockStatus</strong></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function exportToPDF() {
+            var element = document.getElementById('reportContent');
+            var opt = {
+                margin: 0.3, filename: 'StockTrend.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' } 
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+}

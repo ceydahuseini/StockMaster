@@ -1,17 +1,34 @@
+﻿using Microsoft.AspNetCore.Authentication.Cookies; 
 using Microsoft.EntityFrameworkCore;
 using StockMaster.Data;
 using StockMaster.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-// Add services to the container
+builder.Services.AddHttpContextAccessor();
+
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login"; 
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30); 
+        options.Cookie.Name = "StockMasterAuth";
+    });
+
+
 builder.Services.AddControllersWithViews();
 
-// Add DbContext
+
+builder.Services.AddHttpContextAccessor();
+
+
 builder.Services.AddDbContext<StockDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add session
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -19,19 +36,17 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// Add HttpContextAccessor
-builder.Services.AddHttpContextAccessor();
 
-// Register services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ISaleService, SaleService>();
 builder.Services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -40,12 +55,17 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
+
+
 app.UseSession();
+app.UseAuthentication(); 
 app.UseAuthorization();
+
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 
 app.Run();

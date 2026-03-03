@@ -3,6 +3,22 @@
     ViewData["Title"] = "New Sale";
 }
 
+
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <style>
+        
+        .select2-container--bootstrap-5 .select2-selection {
+            border-color: #dee2e6;
+        }
+
+        .is-invalid + .select2-container .select2-selection {
+            border-color: #dc3545;
+        }
+    </style>
+}
+
 <div class="row mb-4">
     <div class="col-12">
         <h2><i class="fas fa-shopping-cart"></i> Create New Sale</h2>
@@ -28,22 +44,24 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Customer</label>
-                            <select name="CustomerId" class="form-select">
+                            
+                            <select name="CustomerId" id="customerSelect" class="form-select">
                                 <option value="">Select customer (optional)</option>
                                 @foreach (var customer in ViewBag.Customers)
                                 {
-                                        <option value="@customer.CustomerId">@customer.Name</option>
+                                    
+                                    <option value="@customer.CustomerId">@customer.Name (@customer.Email)</option>
                                 }
                             </select>
                         </div>
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Warehouse *</label>
-                            <select name="WarehouseId" class="form-select" required>
+                            <select name="WarehouseId" id="warehouseSelect" class="form-select" required>
                                 <option value="">Select warehouse</option>
                                 @foreach (var warehouse in ViewBag.Warehouses)
                                 {
-                                        <option value="@warehouse.WarehouseId">@warehouse.Name</option>
+                                    <option value="@warehouse.WarehouseId">@warehouse.Name</option>
                                 }
                             </select>
                         </div>
@@ -63,43 +81,12 @@
                         
                     </div>
 
-                    <div id="itemTemplate" style="display: none;">
-                        <div class="row mb-3 item-row">
-                            <div class="col-md-5">
-                                <label class="form-label">Product</label>
-                                <select class="form-select product-select" required>
-                                    <option value="">Select product</option>
-                                    @foreach (var product in ViewBag.Products)
-                                    {
-                                            <option value="@product.ProductId" data-price="@product.UnitPrice">
-                                            @product.Name (@product.UnitPrice.ToString("N2") MKD)
-                                            </option>
-                                    }
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Quantity</label>
-                                <input type="number" class="form-control quantity-input" min="1" value="1" required />
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Unit Price</label>
-                                <input type="number" class="form-control price-input" step="0.01" min="0" required />
-                            </div>
-                            <div class="col-md-1">
-                                <label class="form-label">&nbsp;</label>
-                                <button type="button" class="btn btn-danger w-100" onclick="removeItem(this)">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    @if (ViewBag.Products == null || !ViewBag.Products.Any())
+                    @if ((ViewBag.Products == null || ViewBag.Products.Count == 0))
                     {
-                            <div class="alert alert-warning">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                No products available. Please add products first.
-                            </div>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            No products available. Please add products first.
+                        </div>
                     }
                 </div>
             </div>
@@ -129,83 +116,164 @@
     </div>
 </form>
 
+
+<div id="itemTemplate" style="display: none;">
+    <div class="row mb-3 item-row">
+        <div class="col-md-5">
+            <label class="form-label">Product</label>
+            
+            <select class="form-select product-select" required>
+                <option value="">Select product</option>
+                @foreach (var product in ViewBag.Products)
+                {
+                    <option value="@product.ProductId" data-price="@product.UnitPrice">
+                        @product.Name (@product.UnitPrice.ToString("N2") MKD) - SKU: @product.Sku
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Quantity</label>
+            <input type="number" class="form-control quantity-input" min="1" value="1" required />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Unit Price</label>
+            <input type="number" class="form-control price-input" step="0.01" min="0" required />
+        </div>
+        <div class="col-md-1">
+            <label class="form-label">&nbsp;</label>
+            <button type="button" class="btn btn-danger w-100" onclick="removeItem(this)">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
-        <script>
-            let itemIndex = 0;
+    
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-            function addItem() {
-                const template = document.getElementById('itemTemplate').innerHTML;
-                const container = document.getElementById('itemsContainer');
-                const itemDiv = document.createElement('div');
-                itemDiv.innerHTML = template;
+    <script>
+        
+        $(document).ready(function() {
+            
+            $('#customerSelect').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: 'Search for a customer...'
+            });
 
-                const row = itemDiv.firstElementChild;
+            
+            $('#warehouseSelect').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: 'Select warehouse'
+            });
+
+            
+            addItem();
+        });
+
+        function addItem() {
+            const template = document.getElementById('itemTemplate').innerHTML;
+            const container = document.getElementById('itemsContainer');
+            const itemDiv = document.createElement('div');
+            itemDiv.innerHTML = template;
+            const row = itemDiv.firstElementChild;
+
+            container.appendChild(row);
+
+            
+            
+            const $productSelect = $(row).find('.product-select');
+            const quantityInput = row.querySelector('.quantity-input');
+            const priceInput = row.querySelector('.price-input');
+
+            
+            $productSelect.select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: 'Search product...',
+                dropdownParent: $(row) 
+            });
+
+            
+            $productSelect.on('select2:select change', function(e) {
+                
+                const selectedOption = $(this).find(':selected');
+                const price = selectedOption.attr('data-price');
+                priceInput.value = price || 0;
+                calculateTotal();
+            });
+
+            quantityInput.addEventListener('input', calculateTotal);
+            priceInput.addEventListener('input', calculateTotal);
+
+            updateIndices();
+        }
+
+        function removeItem(button) {
+            
+            const row = button.closest('.item-row');
+            $(row).find('.product-select').select2('destroy');
+
+            row.remove();
+            updateIndices();
+            calculateTotal();
+        }
+
+        function updateIndices() {
+            document.querySelectorAll('#itemsContainer .item-row').forEach((row, index) => {
                 const productSelect = row.querySelector('.product-select');
                 const quantityInput = row.querySelector('.quantity-input');
                 const priceInput = row.querySelector('.price-input');
 
-                productSelect.name = `Items[${itemIndex}].ProductId`;
-                quantityInput.name = `Items[${itemIndex}].Quantity`;
-                priceInput.name = `Items[${itemIndex}].UnitPrice`;
+                productSelect.name = `Items[${index}].ProductId`;
+                quantityInput.name = `Items[${index}].Quantity`;
+                priceInput.name = `Items[${index}].UnitPrice`;
+            });
+        }
 
-                productSelect.addEventListener('change', function() {
-                    const selectedOption = this.options[this.selectedIndex];
-                    const price = selectedOption.getAttribute('data-price');
-                    priceInput.value = price || 0;
-                    calculateTotal();
-                });
+        function calculateTotal() {
+            let total = 0;
+            document.querySelectorAll('#itemsContainer .item-row').forEach(row => {
+                const quantity = parseFloat(row.querySelector('.quantity-input').value) || 0;
+                const price = parseFloat(row.querySelector('.price-input').value) || 0;
+                total += quantity * price;
+            });
+            document.getElementById('totalAmount').textContent = total.toFixed(2) + ' MKD';
+        }
 
-                quantityInput.addEventListener('input', calculateTotal);
-                priceInput.addEventListener('input', calculateTotal);
+        document.getElementById('saleForm').addEventListener('submit', function(e) {
+            const itemsCount = document.querySelectorAll('#itemsContainer .item-row').length;
 
-                container.appendChild(row);
-                itemIndex++;
+            if (itemsCount === 0) {
+                e.preventDefault();
+                alert('You must add at least one product!');
+                return false;
             }
 
-            function removeItem(button) {
-                button.closest('.item-row').remove();
-                calculateTotal();
-            }
-
-            function calculateTotal() {
-                let total = 0;
-                document.querySelectorAll('.item-row').forEach(row => {
-                    const quantity = parseFloat(row.querySelector('.quantity-input').value) || 0;
-                    const price = parseFloat(row.querySelector('.price-input').value) || 0;
-                    total += quantity * price;
-                });
-                document.getElementById('totalAmount').textContent = total.toFixed(2) + ' MKD';
-            }
-
-            window.addEventListener('DOMContentLoaded', function() {
-                addItem();
+            let allValid = true;
+            document.querySelectorAll('#itemsContainer .item-row').forEach(row => {
+                const productSelect = row.querySelector('.product-select');
+                if (!productSelect.value) {
+                    allValid = false;
+                    
+                    productSelect.classList.add('is-invalid');
+                    
+                    $(row).find('.select2-selection').addClass('is-invalid-border');
+                } else {
+                    productSelect.classList.remove('is-invalid');
+                }
             });
 
-            document.getElementById('saleForm').addEventListener('submit', function(e) {
-                const itemsCount = document.querySelectorAll('.item-row').length;
-                if (itemsCount === 0) {
-                    e.preventDefault();
-                    alert('You must add at least one product!');
-                    return false;
-                }
+            if (!allValid) {
+                e.preventDefault();
+                alert('Please select products for all items!');
+                return false;
+            }
 
-                
-                let allValid = true;
-                document.querySelectorAll('.item-row').forEach(row => {
-                    const productSelect = row.querySelector('.product-select');
-                    if (!productSelect.value) {
-                        allValid = false;
-                        productSelect.classList.add('is-invalid');
-                    }
-                });
-
-                if (!allValid) {
-                    e.preventDefault();
-                    alert('Please select products for all items!');
-                    return false;
-                }
-
-                return true;
-            });
-        </script>
+            return true;
+        });
+    </script>
 }

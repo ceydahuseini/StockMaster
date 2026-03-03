@@ -1,0 +1,107 @@
+﻿@{
+    ViewData["Title"] = "Reports";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-chart-pie"></i> Advanced Reports</h2>
+        <p class="text-muted">Select a report to view detailed analytics.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100 text-center p-3">
+            <i class="fas fa-warehouse fa-3x text-primary mb-3"></i>
+            <h5>Stock by Warehouse</h5>
+            <a href="/Report/StockByWarehouse" class="btn btn-outline-primary mt-2">View Report</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center p-3">
+            <i class="fas fa-money-bill-wave fa-3x text-success mb-3"></i>
+            <h5>Revenue by Product</h5>
+            <a href="/Report/ProductRevenue" class="btn btn-outline-success mt-2">View Report</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center p-3">
+            <i class="fas fa-clipboard-list fa-3x text-dark mb-3"></i>
+            <h5>PO Status</h5>
+            <a href="/Report/POStatus" class="btn btn-outline-dark mt-2">View Report</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center p-3">
+            <i class="fas fa-tags fa-3x text-info mb-3"></i>
+            <h5>Category Sales</h5>
+            <a href="/Report/CategoryRevenue" class="btn btn-outline-info mt-2">View Report</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center p-3">
+            <i class="fas fa-battery-half fa-3x text-warning mb-3"></i>
+            <h5>Warehouse Capacity</h5>
+            <a href="/Report/WarehouseCapacity" class="btn btn-outline-warning mt-2">View Report</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center p-3">
+            <i class="fas fa-hourglass-end fa-3x text-danger mb-3"></i>
+            <h5>Stagnant Products</h5>
+            <a href="/Report/StagnantProducts" class="btn btn-outline-danger mt-2">View Report</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center p-3">
+            <i class="fas fa-chart-line fa-3x text-secondary mb-3"></i>
+            <h5>Trend Analysis</h5>
+            <a href="/Report/StockSufficiency" class="btn btn-outline-secondary mt-2">View Report</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center p-3">
+            <i class="fas fa-calendar-alt fa-3x text-primary mb-3"></i>
+            <h5>Annual Sales Report</h5>
+            <p class="text-muted small">Last 12 months</p>
+            <a href="/Report/AnnualSales" class="btn btn-outline-primary mt-2">View Report</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center p-3">
+            <i class="fas fa-list-alt fa-3x text-info mb-3"></i>
+            <h5>Detailed PO Report</h5>
+            <p class="text-muted small">Full breakdown</p>
+            <a href="/Report/DetailedPO" class="btn btn-outline-info mt-2">View Report</a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 text-center p-3">
+            <i class="fas fa-calendar-week fa-3x text-primary mb-3"></i>
+            <h5>Sales by Day of Week</h5>
+            <a href="/Report/SalesByDay" class="btn btn-outline-primary mt-2">View Report</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center p-3">
+            <i class="fas fa-users-cog fa-3x text-success mb-3"></i>
+            <h5>Employee Performance</h5>
+            <a href="/Report/EmployeePerformance" class="btn btn-outline-success mt-2">View Report</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center p-3">
+            <i class="fas fa-history fa-3x text-warning mb-3"></i>
+            <h5>Price Change Logs</h5>
+            <a href="/Report/PriceLogs" class="btn btn-outline-warning mt-2">View Report</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center p-3">
+            <i class="fas fa-sun fa-3x text-danger mb-3"></i>
+            <h5>Today's Summary</h5>
+            <a href="/Report/TodaysSummary" class="btn btn-outline-danger mt-2">View Report</a>
+        </div>
+    </div>
+</div>

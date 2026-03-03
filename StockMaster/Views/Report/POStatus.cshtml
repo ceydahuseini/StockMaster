@@ -1,0 +1,66 @@
+﻿@model List<StockMaster.ViewModels.POStatusViewModel>
+@{
+    ViewData["Title"] = "PO Status";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Purchase Order Status</h2>
+    <div>
+        <a href="/Report/Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+        <a href="/Report/ExportPOStatus" class="btn btn-success"><i class="fas fa-file-csv"></i> CSV</a>
+        <button onclick="exportToPDF()" class="btn btn-danger"><i class="fas fa-file-pdf"></i> PDF</button>
+    </div>
+</div>
+
+<div id="reportContent">
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>PO ID</th>
+                <th>Status</th>
+                <th>Product</th>
+                <th>Ordered</th>
+                <th>Received</th>
+                <th>Pending</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>#@item.PoId</td>
+                    <td>@item.Status</td>
+                    <td>@item.ProductName</td>
+                    <td>@item.OrderedQuantity</td>
+                    <td>@item.ReceivedQuantity</td>
+                    <td>
+                        @if (item.PendingQuantity > 0)
+                        {
+                            <span class="text-danger fw-bold">@item.PendingQuantity</span>
+                        }
+                        else
+                        {
+                            <span>0</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function exportToPDF() {
+            var element = document.getElementById('reportContent');
+            var opt = {
+                margin: 0.5, filename: 'POStatus.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+}

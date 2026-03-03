@@ -1,0 +1,59 @@
+﻿@model List<StockMaster.ViewModels.AnnualSalesReportViewModel>
+@{
+    ViewData["Title"] = "Annual Sales Report";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Annual Sales Report (Last 12 Months)</h2>
+    <div>
+        <a href="/Report/Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+        <a href="/Report/ExportAnnualSales" class="btn btn-success"><i class="fas fa-file-csv"></i> CSV</a>
+        <button onclick="exportToPDF()" class="btn btn-danger"><i class="fas fa-file-pdf"></i> PDF</button>
+    </div>
+</div>
+
+<div id="reportContent">
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Month</th>
+                <th>Warehouse</th>
+                <th>Category</th>
+                <th>Supplier</th>
+                <th>Orders</th>
+                <th>Units Sold</th>
+                <th>Revenue</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><strong>@item.SalesMonth</strong></td>
+                    <td>@item.WarehouseName</td>
+                    <td>@item.CategoryName</td>
+                    <td>@item.SupplierName</td>
+                    <td class="text-center">@item.TotalOrderCount</td>
+                    <td class="text-center">@item.TotalUnitsSold</td>
+                    <td class="text-end">@item.TotalGrossRevenue.ToString("N2") MKD</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function exportToPDF() {
+            var element = document.getElementById('reportContent');
+            var opt = {
+                margin: 0.3, filename: 'AnnualSales.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' } 
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+}

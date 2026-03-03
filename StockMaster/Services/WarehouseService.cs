@@ -19,12 +19,14 @@ namespace StockMaster.Services
         public async Task<List<WarehouseStock>> GetWarehouseStockAsync(int warehouseId)
         {
             return await _context.WarehouseStocks
-                .Include(ws => ws.Product)
                 .Include(ws => ws.Warehouse)
+                .Include(ws => ws.Product)
+                    .ThenInclude(p => p.Category)  
+
                 .Where(ws => ws.WarehouseId == warehouseId)
                 .ToListAsync();
         }
-
+      
         public async Task<Dictionary<string, int>> GetStockSummaryAsync()
         {
             var totalProducts = await _context.Products.CountAsync(p => p.IsActive);

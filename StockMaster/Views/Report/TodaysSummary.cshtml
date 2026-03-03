@@ -1,0 +1,99 @@
+﻿@model StockMaster.Models.VwTodaysSummary
+@{
+    ViewData["Title"] = "Today's Summary";
+}
+
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2><i class="fas fa-sun text-warning"></i> Today's Sales Summary (@DateTime.Now.ToString("dd.MM.yyyy"))</h2>
+        <div>
+            <a href="/Report/Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+            <a href="/Report/ExportTodaysSummary" class="btn btn-success"><i class="fas fa-file-csv"></i> CSV</a>
+            <button onclick="exportToPDF()" class="btn btn-danger"><i class="fas fa-file-pdf"></i> PDF</button>
+        </div>
+    </div>
+</div>
+
+@if (Model == null)
+{
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> No sales data found for today.
+    </div>
+}
+else
+{
+    <div id="reportContent">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card text-white bg-success h-100 shadow-sm">
+                    <div class="card-header text-center border-0">Total Revenue</div>
+                    <div class="card-body text-center d-flex flex-column justify-content-center">
+                        <i class="fas fa-money-bill-wave fa-3x mb-3"></i>
+                        <h2 class="card-title fw-bold">@Model.TotalRevenue.ToString("N2") MKD</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card text-white bg-primary h-100 shadow-sm">
+                    <div class="card-header text-center border-0">Transactions</div>
+                    <div class="card-body text-center d-flex flex-column justify-content-center">
+                        <i class="fas fa-receipt fa-3x mb-3"></i>
+                        <h2 class="card-title fw-bold">@Model.TotalTransactions</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card text-white bg-info h-100 shadow-sm">
+                    <div class="card-header text-center border-0">Total Items Sold</div>
+                    <div class="card-body text-center d-flex flex-column justify-content-center">
+                        <i class="fas fa-box-open fa-3x mb-3"></i>
+                        <h2 class="card-title fw-bold">@Model.TotalItemsSold</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card bg-light h-100 border-secondary shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-muted">Unique Customers Today</h5>
+                        <div class="py-3">
+                            <i class="fas fa-users fa-3x text-secondary"></i>
+                        </div>
+                        <h2 class="fw-bold text-dark">@Model.UniqueCustomers</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card bg-light h-100 border-warning shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-muted">Active Warehouses Today</h5>
+                        <div class="py-3">
+                            <i class="fas fa-warehouse fa-3x text-warning"></i>
+                        </div>
+                        <h2 class="fw-bold text-dark">@Model.ActiveWarehouses</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function exportToPDF() {
+            var element = document.getElementById('reportContent');
+            var opt = {
+                margin: 0.5,
+                filename: 'TodaysSummary.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } 
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+}

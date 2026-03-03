@@ -40,24 +40,25 @@ namespace StockMaster.Services
                 .FirstOrDefaultAsync(s => s.SaleId == id);
         }
 
+   
+
         public async Task<bool> CreateSaleAsync(Sale sale)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                
                 _context.Sales.Add(sale);
                 await _context.SaveChangesAsync();
 
-                
                 foreach (var item in sale.SaleItems)
                 {
                     var stock = await _context.WarehouseStocks
-                        .FirstOrDefaultAsync(ws => ws.WarehouseId == sale.WarehouseId && ws.ProductId == item.ProductId);
+                        .FirstOrDefaultAsync(ws => ws.WarehouseId == sale.WarehouseId
+                                                   && ws.ProductId == item.ProductId);
 
                     if (stock == null || stock.QuantityOnHand < item.Quantity)
                     {
-                        throw new Exception("Insufficient stock");
+                        throw new Exception("Insufficient Stock");
                     }
 
                     stock.QuantityOnHand -= item.Quantity;
@@ -66,6 +67,7 @@ namespace StockMaster.Services
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
+
                 return true;
             }
             catch

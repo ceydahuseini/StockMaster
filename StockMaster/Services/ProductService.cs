@@ -10,10 +10,17 @@ namespace StockMaster.Services
     public class ProductService : IProductService
     {
         private readonly StockDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public ProductService(StockDbContext context)
         {
             _context = context;
+        }
+
+        public ProductService(StockDbContext context, IHttpContextAccessor httpContextAccessor)
+        {
+            _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<List<Product>> GetAllProductsAsync()
@@ -46,39 +53,56 @@ namespace StockMaster.Services
                 return false;
             }
         }
-
-        public async Task<bool> UpdateProductAsync(Product product)
+        public async Task<bool> UpdateProductWithUserAsync(Product product, string username)
         {
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                _context.Products.Update(product);
-                await _context.SaveChangesAsync();
-                return true;
+                
+                await _context.Database.ExecuteSqlRawAsync($"SELECT set_config('app.current_user', '{username}', false)");
+
+                
+                _context.Update(product);
+
+                
+                var result = await _context.SaveChangesAsync() > 0;
+
+                
+                await transaction.CommitAsync();
+                return result;
             }
-            catch
+            catch (Exception)
             {
-                return false;
+                await transaction.RollbackAsync();
+                throw;
             }
-        }
+        }        
 
         public async Task<bool> DeleteProductAsync(int id)
         {
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 var product = await _context.Products.FindAsync(id);
+
                 if (product != null)
                 {
                     product.IsActive = false;
                     await _context.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
                     return true;
                 }
+
                 return false;
             }
             catch
             {
+                await transaction.RollbackAsync();
                 return false;
             }
         }
+        
 
         public async Task<List<Product>> GetLowStockProductsAsync()
         {

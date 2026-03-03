@@ -9,8 +9,9 @@ namespace StockMaster.Services
         Task<List<Product>> GetAllProductsAsync();
         Task<Product> GetProductByIdAsync(int id);
         Task<bool> CreateProductAsync(Product product);
-        Task<bool> UpdateProductAsync(Product product);
         Task<bool> DeleteProductAsync(int id);
         Task<List<Product>> GetLowStockProductsAsync();
+
+        Task<bool> UpdateProductWithUserAsync(Product product, string username);
     }
 }
