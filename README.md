@@ -116,6 +116,11 @@ The system includes the following roles:
 | Sales Personnel |
 | Warehouse Staff |
 
+## 🗄️ Database Scripts
+
+- 📄 [DDL - Database Schema](./DDL.sql)
+- 📄 [DML - Sample Data](./DML.sql)
+
 ### 🧪 Test Account
 
 | Username | Password | Role |
